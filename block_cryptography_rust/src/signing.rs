@@ -98,4 +98,12 @@ mod tests {
             _ => { panic!(); }
         };
     }
+
+    #[test]
+    fn key_saving_and_loading_test() {
+        let (keys, bytes) = generate_keys().unwrap();
+        save_key(bytes.as_ref(), "test.bin".to_string()).unwrap();
+        let newkey = load_key("test.bin".to_string()).unwrap();
+        assert_eq!(format!("{:?}", keys), format!("{:?}", newkey));
+    }
 }
