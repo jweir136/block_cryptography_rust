@@ -19,7 +19,7 @@ pub fn generate_keys() -> std::result::Result<(RSAKeyPair, Document), Unspecifie
     Ok((key_pair, pkcs8_bytes))
 }
 
-pub fn sign_data(key_pair: &Ed25519KeyPair, data: &[u8]) -> Signature {
+pub fn sign_data(key_pair: &Ed25519KeyPair, data: &[u8]) -> RSASignature {
     key_pair.sign(data)
 }
 
