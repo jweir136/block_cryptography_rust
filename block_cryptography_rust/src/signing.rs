@@ -50,10 +50,10 @@ pub fn save_key(key: &[u8], filename: String) -> Result<(), &str> {
 
 pub fn load_key(filename: String) -> Result<RSAKeyPair, String> {
     match File::open(filename) {
-        Ok(mut fs) =>   {
-                            let mut buff: [u8;1000] = [0; 1000];
-                            let n_bytes: usize = fs.read(&mut buff).unwrap() as usize;
-                            Ok(signature::Ed25519KeyPair::from_pkcs8(&buff).unwrap())
+        Ok(mut fs) =>   { 
+                            let mut byte_vec = Vec::<u8>::new();
+                            fs.read_to_end(&mut byte_vec).unwrap();
+                            Ok(signature::Ed25519KeyPair::from_pkcs8(&byte_vec[..]).unwrap())
                         },
         _ =>            {
                             Err("Cannot open file".to_string())
