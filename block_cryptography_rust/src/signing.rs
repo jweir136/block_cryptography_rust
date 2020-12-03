@@ -8,7 +8,10 @@ use ring::{
     signature::{self, KeyPair, Ed25519KeyPair, Signature},
 };
 
-pub fn generate_keys() -> std::result::Result<Ed25519KeyPair, Unspecified> {
+pub type RSAKeyPair = Ed25519KeyPair;
+pub type RSASignature = Signature;
+
+pub fn generate_keys() -> std::result::Result<RSAKeyPair, Unspecified> {
     let rng = rand::SystemRandom::new();
     let pkcs8_bytes = signature::Ed25519KeyPair::generate_pkcs8(&rng)?;
     let key_pair = signature::Ed25519KeyPair::from_pkcs8(pkcs8_bytes.as_ref())?;
@@ -19,7 +22,7 @@ pub fn sign_data(key_pair: &Ed25519KeyPair, data: &[u8]) -> Signature {
     key_pair.sign(data)
 }
 
-pub fn verify_data(public_key_bytes: &[u8], data: &[u8], signature: Signature) -> bool {
+pub fn verify_data(public_key_bytes: &[u8], data: &[u8], signature: RSASignature) -> bool {
     let peer_public_key = signature::UnparsedPublicKey::new(&signature::ED25519, public_key_bytes);
     match peer_public_key.verify(data, signature.as_ref()) {
         Ok(()) => { true },
@@ -69,7 +72,7 @@ mod tests {
         ];
 
         for test in &tests {
-            let keys: Ed25519KeyPair = generate_keys().unwrap();
+            let keys: RSAKeyPair = generate_keys().unwrap();
 
             let sig = sign_data(&keys, test.as_bytes());
             #[allow(unreachable_patterns)]
@@ -82,7 +85,7 @@ mod tests {
     }
 
     #[test]
-    pub fn incorrect_signing_test() {
+    fn incorrect_signing_test() {
         let mut keys = generate_keys().unwrap();
         let sig = sign_data(&keys, "test".as_bytes());
         keys = generate_keys().unwrap();
