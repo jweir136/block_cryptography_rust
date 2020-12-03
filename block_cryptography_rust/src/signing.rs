@@ -48,15 +48,16 @@ pub fn save_key(key: &[u8], filename: String) -> Result<(), &str> {
     }
 }
 
-pub fn load_key(filename: String, key_buff: &mut [u8]) -> Result<(), &str> {
+pub fn load_key(filename: String) -> Result<RSAKeyPair, String> {
     match File::open(filename) {
         Ok(mut fs) =>   {
-                        fs.read(key_buff).unwrap();
-                        Ok(())
-                    },
-        _ =>        {
-                        Err("File cannot be found")
-                    }
+                            let mut buff: [u8;1000] = [0; 1000];
+                            let n_bytes: usize = fs.read(&mut buff).unwrap() as usize;
+                            Ok(signature::Ed25519KeyPair::from_pkcs8(&buff).unwrap())
+                        },
+        _ =>            {
+                            Err("Cannot open file".to_string())
+                        }
     }
 }
 
