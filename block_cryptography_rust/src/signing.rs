@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
 use ring::error::Unspecified;
+use ring::pkcs8::Document;
 #[allow(unused_imports)]
 use ring::{
     rand,
@@ -11,11 +12,11 @@ use ring::{
 pub type RSAKeyPair = Ed25519KeyPair;
 pub type RSASignature = Signature;
 
-pub fn generate_keys() -> std::result::Result<RSAKeyPair, Unspecified> {
+pub fn generate_keys() -> std::result::Result<(RSAKeyPair, Document), Unspecified> {
     let rng = rand::SystemRandom::new();
     let pkcs8_bytes = signature::Ed25519KeyPair::generate_pkcs8(&rng)?;
     let key_pair = signature::Ed25519KeyPair::from_pkcs8(pkcs8_bytes.as_ref())?;
-    Ok(key_pair)
+    Ok((key_pair, pkcs8_bytes))
 }
 
 pub fn sign_data(key_pair: &Ed25519KeyPair, data: &[u8]) -> Signature {
