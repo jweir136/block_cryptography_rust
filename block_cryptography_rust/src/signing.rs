@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::{Read, Write};
+use std::path::Path;
 use ring::error::Unspecified;
 #[allow(unused_imports)]
 use ring::{
@@ -21,6 +24,35 @@ pub fn verify_data(public_key_bytes: &[u8], data: &[u8], signature: Signature) -
     match peer_public_key.verify(data, signature.as_ref()) {
         Ok(()) => { true },
         _ => { false }
+    }
+}
+
+pub fn save_key(key: &[u8], filename: String) -> Result<(), &str> {
+    if Path::new(&filename).is_file() {
+        Err("File already exists")
+    } else {
+        match File::create(filename) {
+            Ok(mut fs) =>   {
+                            fs.write_all(key).unwrap();
+                            fs.flush().unwrap();
+                            Ok(())
+                        },
+            _ =>        {
+                            Err("File cannot be created")
+                        }
+        }
+    }
+}
+
+pub fn load_key(filename: String, key_buff: &mut [u8]) -> Result<(), &str> {
+    match File::open(filename) {
+        Ok(mut fs) =>   {
+                        fs.read(key_buff).unwrap();
+                        Ok(())
+                    },
+        _ =>        {
+                        Err("File cannot be found")
+                    }
     }
 }
 
