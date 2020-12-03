@@ -63,6 +63,7 @@ pub fn load_key(filename: String, key_buff: &mut [u8]) -> Result<(), &str> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ring::pkcs8::Document;
     
     #[test]
     fn correct_signing_test() {
@@ -73,7 +74,7 @@ mod tests {
         ];
 
         for test in &tests {
-            let keys: RSAKeyPair = generate_keys().unwrap();
+            let (keys, _document): (RSAKeyPair, Document) = generate_keys().unwrap();
 
             let sig = sign_data(&keys, test.as_bytes());
             #[allow(unreachable_patterns)]
@@ -87,9 +88,9 @@ mod tests {
 
     #[test]
     fn incorrect_signing_test() {
-        let mut keys = generate_keys().unwrap();
+        let (keys, _document): (RSAKeyPair, Document) = generate_keys().unwrap();
         let sig = sign_data(&keys, "test".as_bytes());
-        keys = generate_keys().unwrap();
+        let (keys, _document) = generate_keys().unwrap();
 
         match verify_data(keys.public_key().as_ref(), "test".as_bytes(), sig) {
             false => {},
