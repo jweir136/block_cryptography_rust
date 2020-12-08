@@ -23,7 +23,7 @@ pub fn sign_data(key_pair: &Ed25519KeyPair, data: &[u8]) -> RSASignature {
     key_pair.sign(data)
 }
 
-pub fn verify_data(public_key_bytes: &[u8], data: &[u8], signature: RSASignature) -> bool {
+pub fn verify_data(public_key_bytes: &[u8], data: &[u8], signature: &RSASignature) -> bool {
     let peer_public_key = signature::UnparsedPublicKey::new(&signature::ED25519, public_key_bytes);
     match peer_public_key.verify(data, signature.as_ref()) {
         Ok(()) => { true },
@@ -79,7 +79,7 @@ mod tests {
 
             let sig = sign_data(&keys, test.as_bytes());
             #[allow(unreachable_patterns)]
-            match verify_data(keys.public_key().as_ref(), test.as_bytes(), sig) {
+            match verify_data(keys.public_key().as_ref(), test.as_bytes(), &sig) {
                 false => { panic!(); },
                 true => {},
                 _ => { panic!(); }
@@ -93,7 +93,7 @@ mod tests {
         let sig = sign_data(&keys, "test".as_bytes());
         let (keys, _document) = generate_keys().unwrap();
 
-        match verify_data(keys.public_key().as_ref(), "test".as_bytes(), sig) {
+        match verify_data(keys.public_key().as_ref(), "test".as_bytes(), &sig) {
             false => {},
             _ => { panic!(); }
         };
