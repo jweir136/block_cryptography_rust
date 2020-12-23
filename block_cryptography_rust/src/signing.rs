@@ -23,9 +23,9 @@ pub fn sign_data(key_pair: &Ed25519KeyPair, data: &[u8]) -> RSASignature {
     key_pair.sign(data)
 }
 
-pub fn verify_data(public_key_bytes: &[u8], data: &[u8], signature: &RSASignature) -> bool {
+pub fn verify_data(public_key_bytes: &[u8], data: &[u8], signature: &[u8]) -> bool {
     let peer_public_key = signature::UnparsedPublicKey::new(&signature::ED25519, public_key_bytes);
-    match peer_public_key.verify(data, signature.as_ref()) {
+    match peer_public_key.verify(data, signature) {
         Ok(()) => { true },
         _ => { false }
     }
